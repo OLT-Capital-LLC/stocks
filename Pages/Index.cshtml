@@ -1,0 +1,58 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Charts";
+}
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-12"><h1>Charts</h1></div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <section>
+                    <h2>google.visualization.ColumnChart(GetStockData)</h2>
+                    <div id="StockData_Chart"></div>
+                    <h2 style="margin-top:50px;">Data</h2>
+                    <textarea id="StockData_Data" style="width:100%;height: 300px;"></textarea>
+                </section>
+                <script>
+                    $(document).ready(function () {
+                        $.get("GetStockData", function (data) {
+                            var json = JSON.parse(data);
+                            $("#StockData_Data").text(JSON.stringify(json));
+                            //console.log(JSON.stringify(json));
+                            google.charts.load('current', { 'packages': ['corechart'] });
+                            google.charts.setOnLoadCallback(drawChart);
+                            function drawChart() {
+                                var jsonForChart = {};
+                                jsonForChart =
+                                {
+                                    "cols": [
+                                        { "id": "", "label": "Date", "pattern": "", "type": "string" },
+                                        { "id": "", "label": "Volume", "pattern": "", "type": "number" }
+                                    ],
+                                    "rows": []
+                                }
+                                for (var i = 0; i < json.length; i++) {
+                                    var jsond = json[i];
+                                    var x = { "c": [] };
+                                    var vf1 = { "v": jsond.Date };
+                                    x.c.push(vf1);
+                                    var vf2 = { "v": jsond.Volume };
+                                    x.c.push(vf2);
+                                    jsonForChart.rows.push(x);
+                                }
+                                //console.log(JSON.stringify(jsonForChart));
+                                var data = new google.visualization.DataTable(jsonForChart);
+                                var options = {legend: 'none'};
+                                var chart = new google.visualization.ColumnChart(document.getElementById('StockData_Chart'));
+                                chart.draw(data, options);
+                            }
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+</article>

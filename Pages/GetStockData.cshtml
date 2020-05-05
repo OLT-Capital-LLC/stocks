@@ -1,0 +1,20 @@
+﻿@page
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@model GetStockDataModel
+@{
+    Layout = "";
+    //Response.ContentType = "application/json";
+
+    string connectionString = Configuration.GetConnectionString("DefaultConnection"); //set in the appsettings.json file
+    System.Data.SqlClient.SqlConnection conn = new System.Data.SqlClient.SqlConnection(connectionString);
+    conn.Open();
+    System.Data.SqlClient.SqlCommand cmd = conn.CreateCommand();
+    cmd.CommandText = "exec GetStockPriceData";
+    System.Data.SqlClient.SqlDataReader reader = cmd.ExecuteReader();
+    System.Data.DataTable dataTable = new System.Data.DataTable();
+    dataTable.Load(reader);
+    string retval = Newtonsoft.Json.JsonConvert.SerializeObject(dataTable);
+    conn.Close();
+    @Html.Raw(retval)
+}
